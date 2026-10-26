@@ -16,23 +16,12 @@ jobs:
         gem install cocoapods --no-document
         pod install
 
-    - name: Patch CircularProgressMac for Swift 5+ compatibility
-      run: |
-        FILE="Pods/CircularProgressMac/Sources/CircularProgress/util.swift"
-        if [ -f "$FILE" ]; then
-          chmod +w "$FILE"
-          sed -i '' '267a\
-                        case .cubicCurveTo:\
-                            break\
-                        case .quadraticCurveTo:\
-                            break' "$FILE"
-        fi
-
     - name: Build for Apple Silicon (arm64)
       run: |
         xcodebuild -workspace SplitNSP-Swift-GUI.xcworkspace \
           -scheme SplitNSP-Swift-GUI \
           -destination 'platform=macOS,arch=arm64' \
+          SWIFT_VERSION=4.2 \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           MACOSX_DEPLOYMENT_TARGET=14.0 \
