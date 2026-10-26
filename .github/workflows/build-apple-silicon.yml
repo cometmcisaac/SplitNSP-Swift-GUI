@@ -57,3 +57,4 @@ jobs:
           --notes "Auto-release for Apple Silicon (arm64) build on macOS 14.0+" \
           --prerelease \
           build/Products/Release/*.app || echo "Release creation skipped or artifact missing"
+# trigger
