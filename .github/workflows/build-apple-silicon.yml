@@ -21,19 +21,11 @@ jobs:
         FILE="Pods/CircularProgressMac/Sources/CircularProgress/util.swift"
         if [ -f "$FILE" ]; then
           chmod +w "$FILE"
-          awk '
-            /.closeSubpath:/ { found=1 }
-            found && /break/ {
-              print
-              print "                        case .cubicCurveTo:"
-              print "                            break"
-              print "                        case .quadraticCurveTo:"
-              print "                            break"
-              found=0
-              next
-            }
-            { print }
-          ' "$FILE" > /tmp/util_fixed.swift && mv /tmp/util_fixed.swift "$FILE"
+          sed -i '' '267a\
+                        case .cubicCurveTo:\
+                            break\
+                        case .quadraticCurveTo:\
+                            break' "$FILE"
         fi
 
     - name: Build for Apple Silicon (arm64)
