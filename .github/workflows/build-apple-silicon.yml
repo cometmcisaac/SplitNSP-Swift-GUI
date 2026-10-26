@@ -66,3 +66,4 @@ jobs:
           build/Products/Release/*.app || echo "Release creation skipped or artifact missing"
 # trigger
 # trigger
+# trigger build
