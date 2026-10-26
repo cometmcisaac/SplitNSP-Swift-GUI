@@ -20,19 +20,16 @@ jobs:
       run: |
         FILE="Pods/CircularProgressMac/Sources/CircularProgress/util.swift"
         if [ -f "$FILE" ]; then
-          # Add missing switch cases for newer Swift compilers
           python3 << 'PYEOF'
-import re
 with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "r") as f:
     content = f.read()
-# Find the switch block and inject default cases for missing types
-old = "                        default:\n                            break"
-new = "                        case .cubicCurveTo, .quadraticCurveTo:\n                            break\n                        default:\n                            break"
-if old in content:
-    content = content.replace(old, new)
+old_str = ".closeSubpath:\n                            break"
+new_str = ".closeSubpath:\n                            break\n                        case .cubicCurveTo:\n                            break\n                        case .quadraticCurveTo:\n                            break"
+if ".closeSubpath:" in content:
+    content = content.replace(old_str, new_str)
     with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "w") as f:
         f.write(content)
-print("Patched util.swift")
+    print("Patched util.swift")
 PYEOF
         fi
 
