@@ -1,0 +1,30 @@
+name: Build Apple Silicon
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build-apple-silicon:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install CocoaPods
+      run: |
+        gem install cocoapods --no-document
+        pod install
+
+    - name: Build for Apple Silicon (arm64)
+      run: |
+        xcodebuild -workspace SplitNSP-Swift-GUI.xcworkspace \
+          -scheme SplitNSP-Swift-GUI \
+          -destination 'platform=macOS,arch=arm64' \
+          build
+
+    - name: Archive build
+      uses: actions/upload-artifact@v4
+      with:
+        name: SplitNSP-Swift-GUI-arm64
+        path: build/Products/Release/*.app
