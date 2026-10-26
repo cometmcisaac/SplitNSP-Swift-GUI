@@ -16,6 +16,26 @@ jobs:
         gem install cocoapods --no-document
         pod install
 
+    - name: Patch CircularProgressMac for Swift 5+ compatibility
+      run: |
+        FILE="Pods/CircularProgressMac/Sources/CircularProgress/util.swift"
+        if [ -f "$FILE" ]; then
+          # Add missing switch cases for newer Swift compilers
+          python3 << 'PYEOF'
+import re
+with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "r") as f:
+    content = f.read()
+# Find the switch block and inject default cases for missing types
+old = "                        default:\n                            break"
+new = "                        case .cubicCurveTo, .quadraticCurveTo:\n                            break\n                        default:\n                            break"
+if old in content:
+    content = content.replace(old, new)
+    with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "w") as f:
+        f.write(content)
+print("Patched util.swift")
+PYEOF
+        fi
+
     - name: Build for Apple Silicon (arm64)
       run: |
         xcodebuild -workspace SplitNSP-Swift-GUI.xcworkspace \
