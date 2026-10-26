@@ -43,7 +43,7 @@ PYEOF
           -destination 'platform=macOS,arch=arm64' \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
-          MACOSX_DEPLOYMENT_TARGET=10.13 \
+          MACOSX_DEPLOYMENT_TARGET=14.0 \
           build
 
     - name: Archive build
@@ -51,3 +51,16 @@ PYEOF
       with:
         name: SplitNSP-Swift-GUI-arm64
         path: build/Products/Release/*.app
+
+    - name: Create GitHub Release (auto on success)
+      if: success()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Only create a new release if this is a push to master/main
+        gh release create "v${{ github.run_number }}-arm64" \
+          --repo cometmcisaac/SplitNSP-Swift-GUI \
+          --title "Apple Silicon Build v${{ github.run_number }}" \
+          --notes "Auto-release for Apple Silicon (arm64) build on macOS 14.0+" \
+          --prerelease \
+          build/Products/Release/*.app || echo "Release creation skipped or artifact missing"
