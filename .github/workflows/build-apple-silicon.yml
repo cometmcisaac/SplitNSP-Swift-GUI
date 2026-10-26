@@ -20,25 +20,13 @@ jobs:
       run: |
         FILE="Pods/CircularProgressMac/Sources/CircularProgress/util.swift"
         if [ -f "$FILE" ]; then
-          python3 << 'PYEOF'
-with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "r") as f:
-    lines = f.readlines()
-with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "w") as f:
-    inserted = False
-    i = 0
-    while i < len(lines):
-        f.write(lines[i])
-        if ".closeSubpath:" in lines[i] and not inserted:
-            i += 1
-            if i < len(lines):
-                f.write(lines[i])
-            f.write("                        case .cubicCurveTo:\n")
-            f.write("                            break\n")
-            f.write("                        case .quadraticCurveTo:\n")
-            f.write("                            break\n")
-            inserted = True
-        i += 1
-PYEOF
+          echo 'with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "r") as f: content = f.read()' > /tmp/patch.py
+          echo 'old = ".closeSubpath:\n                            break"' >> /tmp/patch.py
+          echo 'new = ".closeSubpath:\n                            break\n                        case .cubicCurveTo:\n                            break\n                        case .quadraticCurveTo:\n                            break"' >> /tmp/patch.py
+          echo 'if ".closeSubpath:" in content: content = content.replace(old, new)' >> /tmp/patch.py
+          echo 'with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "w") as f: f.write(content)' >> /tmp/patch.py
+          echo 'print("patched util.swift")' >> /tmp/patch.py
+          python3 /tmp/patch.py
         fi
 
     - name: Build for Apple Silicon (arm64)
