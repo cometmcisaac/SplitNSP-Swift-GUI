@@ -20,6 +20,7 @@ jobs:
       run: |
         FILE="Pods/CircularProgressMac/Sources/CircularProgress/util.swift"
         if [ -f "$FILE" ]; then
+          chmod +w "$FILE"
           echo 'with open("Pods/CircularProgressMac/Sources/CircularProgress/util.swift", "r") as f: content = f.read()' > /tmp/patch.py
           echo 'old = ".closeSubpath:\n                            break"' >> /tmp/patch.py
           echo 'new = ".closeSubpath:\n                            break\n                        case .cubicCurveTo:\n                            break\n                        case .quadraticCurveTo:\n                            break"' >> /tmp/patch.py
